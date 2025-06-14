@@ -1,18 +1,25 @@
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import NavBar from './NavBar';
+import Home from '../pages/Home';
+import OddsCalculator from '../pages/OddsCalculator';
+import Glossary from '../pages/Glossary';
+import BetSlipSimulator from '../pages/BetSlipSimulator';
+
 function App() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
-      <div className="bg-white p-8 rounded-lg shadow-xl transform hover:scale-105 transition-transform duration-300">
-        <h1 className="text-4xl font-bold text-gray-800 mb-4">
-          Tailwind CSS is Working! 🎉
-        </h1>
-        <p className="text-gray-600 mb-6">
-          If you can see this styled card with a gradient background, Tailwind CSS is properly configured.
-        </p>
-        <button className="bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-300">
-          Click Me!
-        </button>
+    <Router>
+      <div className="min-h-screen bg-background dark:bg-dark transition-colors duration-200">
+        <NavBar />
+        <main className="container mx-auto py-8 px-4 sm:px-6 lg:px-8">
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/calculator" element={<OddsCalculator />} />
+            <Route path="/glossary" element={<Glossary />} />
+            <Route path="/simulator" element={<BetSlipSimulator />} />
+          </Routes>
+        </main>
       </div>
-    </div>
+    </Router>
   );
 }
 
