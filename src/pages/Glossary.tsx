@@ -1,94 +1,28 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { SparklesIcon, MagnifyingGlassIcon, ShareIcon, LightBulbIcon, CalculatorIcon } from '@heroicons/react/24/outline';
+import { SparklesIcon, MagnifyingGlassIcon, ShareIcon, LightBulbIcon } from '@heroicons/react/24/outline';
+import { glossaryTerms } from '../glossary.lessons';
 
-type TermCategory = 'Bet Type' | 'Slang' | 'Odds Format' | 'Strategy';
-
-type Term = {
-  id: string;
-  name: string;
-  category: TermCategory;
-  emoji: string;
-  definition: string;
-  example: string;
-  calculatorExample?: {
-    format: 'american' | 'decimal' | 'fractional';
-    odds: string;
-    stake: string;
-  };
+type Quiz = {
+  question: string;
+  choices: string[];
+  correctAnswer: string;
 };
 
-const terms: Term[] = [
-  {
-    id: 'moneyline',
-    name: 'Moneyline',
-    category: 'Bet Type',
-    emoji: '💰',
-    definition: 'A bet on which team will win the game outright, regardless of the score margin.',
-    example: 'If you bet $100 on Team A at -150, you need to risk $150 to win $100. If you bet on Team B at +200, you risk $100 to win $200.',
-    calculatorExample: {
-      format: 'american',
-      odds: '-150',
-      stake: '100',
-    },
-  },
-  {
-    id: 'spread',
-    name: 'Point Spread',
-    category: 'Bet Type',
-    emoji: '📊',
-    definition: 'A handicap given to the favorite team to make the betting odds more even.',
-    example: 'If Team A is favored by 7 points (-7), they must win by more than 7 points for you to win your bet.',
-  },
-  {
-    id: 'over-under',
-    name: 'Over/Under (Totals)',
-    category: 'Bet Type',
-    emoji: '📈',
-    definition: 'A bet on whether the total combined score of both teams will be over or under a specified number.',
-    example: 'If the over/under is 45.5 points, you can bet whether the total score will be higher or lower than 45.5.',
-  },
-  {
-    id: 'parlay',
-    name: 'Parlay',
-    category: 'Strategy',
-    emoji: '🎯',
-    definition: 'A single bet that combines multiple individual bets, where all selections must win for the bet to pay out.',
-    example: 'A 3-team parlay might pay 6-1 odds, meaning a $100 bet would win $600 if all three teams win.',
-  },
-  {
-    id: 'teaser',
-    name: 'Teaser',
-    category: 'Strategy',
-    emoji: '🎲',
-    definition: 'A type of parlay where you can adjust the point spread in your favor, but with lower payouts.',
-    example: 'A 6-point teaser might move a -7 spread to -1, making it easier to win but with reduced odds.',
-  },
-  {
-    id: 'prop-bet',
-    name: 'Prop Bet',
-    category: 'Bet Type',
-    emoji: '🎪',
-    definition: 'A bet on a specific event or occurrence within a game that doesn\'t directly affect the final score.',
-    example: 'Betting on which player will score first, or how many yards a quarterback will throw for.',
-  },
-  {
-    id: 'futures',
-    name: 'Futures',
-    category: 'Bet Type',
-    emoji: '🔮',
-    definition: 'Bets placed on events that will occur in the future, such as championship winners.',
-    example: 'Betting on which team will win the Super Bowl before the season starts.',
-  },
-  {
-    id: 'live-betting',
-    name: 'Live Betting',
-    category: 'Strategy',
-    emoji: '⚡',
-    definition: 'Placing bets while the game is in progress, with odds that change based on the game situation.',
-    example: 'Betting on the next team to score after watching the first quarter of play.',
-  },
-];
+type Term = {
+  term: string;
+  emoji: string;
+  category: string;
+  definition: string;
+  example: string;
+  calculatorPrefill: {
+    odds: string;
+    stake: number;
+  };
+  quiz: Quiz;
+};
+
+const terms = glossaryTerms;
 
 const quickTips = [
   "Always shop around for the best odds - different sportsbooks offer different lines",
@@ -104,10 +38,12 @@ const quickTips = [
 const Glossary = () => {
   const [learnedTerms, setLearnedTerms] = useState<Set<string>>(new Set());
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState<TermCategory | 'All'>('All');
+  const [selectedCategory, setSelectedCategory] = useState<string | 'All'>('All');
   const [showQuickTip, setShowQuickTip] = useState(false);
   const [currentTip, setCurrentTip] = useState('');
-  const [expandedTerm, setExpandedTerm] = useState<string | null>(null);
+  const [expandedTerm, setExpandedTerm] = useState<number | null>(null);
+  const [quizAnswers, setQuizAnswers] = useState<Record<string, string>>({});
+  const [quizFeedback, setQuizFeedback] = useState<Record<string, string>>({});
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -129,12 +65,11 @@ const Glossary = () => {
   };
 
   const handleTryTerm = (term: Term) => {
-    if (term.calculatorExample) {
+    if (term.calculatorPrefill) {
       navigate('/calculator', {
         state: {
-          format: term.calculatorExample.format,
-          odds: term.calculatorExample.odds,
-          stake: term.calculatorExample.stake,
+          odds: term.calculatorPrefill.odds,
+          stake: term.calculatorPrefill.stake,
         },
       });
     }
@@ -142,7 +77,7 @@ const Glossary = () => {
 
   const handleSurpriseMe = () => {
     const randomTerm = terms[Math.floor(Math.random() * terms.length)];
-    const element = document.getElementById(`term-${randomTerm.id}`);
+    const element = document.getElementById(`term-${randomTerm.term}`);
     if (element) {
       element.scrollIntoView({ behavior: 'smooth', block: 'center' });
       element.classList.add('animate-pulse');
@@ -153,7 +88,7 @@ const Glossary = () => {
   };
 
   const handleShare = async (term: Term) => {
-    const shareText = `Check out this betting term: ${term.name} - ${term.definition}`;
+    const shareText = `Check out this betting term: ${term.term} - ${term.definition}`;
     if (navigator.share) {
       try {
         await navigator.share({
@@ -177,7 +112,7 @@ const Glossary = () => {
   };
 
   const filteredTerms = terms.filter(term => {
-    const matchesSearch = term.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    const matchesSearch = term.term.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          term.definition.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesCategory = selectedCategory === 'All' || term.category === selectedCategory;
     return matchesSearch && matchesCategory;
@@ -242,7 +177,7 @@ const Glossary = () => {
         <select
           id="category-select"
           value={selectedCategory}
-          onChange={(e) => setSelectedCategory(e.target.value as TermCategory | 'All')}
+          onChange={(e) => setSelectedCategory(e.target.value as string | 'All')}
           className="w-full sm:w-48 p-2 border rounded-md bg-white dark:bg-dark border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white focus:ring-2 focus:ring-accent focus:border-transparent transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
           aria-label="Filter by category"
         >
@@ -264,22 +199,22 @@ const Glossary = () => {
         </aside>
       )}
       
-      <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" aria-label="Glossary Terms">
-        {filteredTerms.map((term) => (
+      <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-start" aria-label="Glossary Terms">
+        {filteredTerms.map((term, idx) => (
           <article
-            key={term.id}
-            id={`term-${term.id}`}
+            key={term.term}
+            id={`term-${term.term}`}
             className={`bg-white dark:bg-dark rounded-lg shadow-md p-6 transition-all duration-200 border border-gray-200 dark:border-gray-700 cursor-pointer hover:shadow-lg focus-within:ring-2 focus-within:ring-accent ${
-              expandedTerm === term.id ? 'ring-2 ring-accent' : ''
+              expandedTerm === idx ? 'ring-2 ring-accent' : ''
             }`}
             tabIndex={0}
-            aria-expanded={expandedTerm === term.id}
-            aria-label={`Term: ${term.name}`}
+            aria-expanded={expandedTerm === idx}
+            aria-label={`Term: ${term.term}`}
             role="region"
-            onClick={() => setExpandedTerm(expandedTerm === term.id ? null : term.id)}
+            onClick={() => setExpandedTerm(expandedTerm === idx ? null : idx)}
             onKeyDown={e => {
               if (e.key === 'Enter' || e.key === ' ') {
-                setExpandedTerm(expandedTerm === term.id ? null : term.id);
+                setExpandedTerm(expandedTerm === idx ? null : idx);
               }
             }}
           >
@@ -288,7 +223,7 @@ const Glossary = () => {
                 <span className="text-2xl" aria-hidden="true">{term.emoji}</span>
                 <div>
                   <h2 className="text-xl font-semibold text-primary dark:text-white">
-                    {term.name}
+                    {term.term}
                   </h2>
                   <span className="text-sm text-gray-500 dark:text-gray-400">
                     {term.category}
@@ -296,7 +231,7 @@ const Glossary = () => {
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                {learnedTerms.has(term.id) && (
+                {learnedTerms.has(term.term) && (
                   <span className="bg-accent/20 text-accent px-2 py-1 rounded-full text-xs font-medium" aria-label="Learned">Learned</span>
                 )}
                 <button
@@ -305,7 +240,7 @@ const Glossary = () => {
                     handleShare(term);
                   }}
                   className="p-1 text-gray-500 hover:text-accent transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
-                  aria-label={`Share term ${term.name}`}
+                  aria-label={`Share term ${term.term}`}
                   title="Share term"
                 >
                   <ShareIcon className="h-5 w-5" aria-hidden="true" />
@@ -317,7 +252,7 @@ const Glossary = () => {
               {term.definition}
             </p>
 
-            {expandedTerm === term.id && (
+            {expandedTerm === idx && (
               <div className="mt-4 space-y-4 transition-all duration-300">
                 <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-md">
                   <p className="text-sm text-gray-600 dark:text-gray-400">
@@ -326,34 +261,71 @@ const Glossary = () => {
                 </div>
 
                 <div className="flex flex-col gap-2">
-                  {term.calculatorExample && (
-                    <button
-                      onClick={e => {
-                        e.stopPropagation();
-                        handleTryTerm(term);
-                      }}
-                      className="w-full bg-primary text-white py-2 px-4 rounded-md hover:bg-primary/90 transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
-                      aria-label={`Try this term in the calculator: ${term.name}`}
-                      title="Try this term in the calculator"
-                    >
-                      Try This Term
-                    </button>
-                  )}
                   <button
                     onClick={e => {
                       e.stopPropagation();
-                      toggleLearned(term.id);
+                      handleTryTerm(term);
+                    }}
+                    className="w-full bg-primary text-white py-2 px-4 rounded-md hover:bg-primary/90 transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                    aria-label={`Try this term in the calculator: ${term.term}`}
+                    title="Try this term in the calculator"
+                  >
+                    Try This Term
+                  </button>
+                  <button
+                    onClick={e => {
+                      e.stopPropagation();
+                      toggleLearned(term.term);
                     }}
                     className={`w-full py-2 px-4 rounded-md transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent ${
-                      learnedTerms.has(term.id)
+                      learnedTerms.has(term.term)
                         ? 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
                         : 'bg-accent/10 text-accent hover:bg-accent/20'
                     }`}
-                    aria-label={learnedTerms.has(term.id) ? `Mark ${term.name} as unlearned` : `Mark ${term.name} as learned`}
-                    title={learnedTerms.has(term.id) ? 'Mark as unlearned' : 'Mark as learned'}
+                    aria-label={learnedTerms.has(term.term) ? `Mark ${term.term} as unlearned` : `Mark ${term.term} as learned`}
+                    title={learnedTerms.has(term.term) ? 'Mark as unlearned' : 'Mark as learned'}
                   >
-                    {learnedTerms.has(term.id) ? 'Mark as Unlearned' : 'Mark as Learned'}
+                    {learnedTerms.has(term.term) ? 'Mark as Unlearned' : 'Mark as Learned'}
                   </button>
+                </div>
+
+                {/* Quiz Section */}
+                <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-md">
+                  <p className="font-medium text-primary dark:text-accent mb-2">Quiz:</p>
+                  <p className="mb-3 text-gray-700 dark:text-gray-300">{term.quiz.question}</p>
+                  <div className="flex flex-col gap-2">
+                    {term.quiz.choices.map((choice) => (
+                      <button
+                        key={choice}
+                        className={`text-left px-4 py-2 rounded-md border transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent ${
+                          quizAnswers[term.term] === choice
+                            ? choice === term.quiz.correctAnswer
+                              ? 'bg-green-100 border-green-400 text-green-800'
+                              : 'bg-red-100 border-red-400 text-red-800'
+                            : 'bg-white dark:bg-dark border-gray-300 dark:border-gray-600 hover:bg-accent/10'
+                        }`}
+                        onClick={e => {
+                          e.stopPropagation();
+                          setQuizAnswers((prev) => ({ ...prev, [term.term]: choice }));
+                          if (choice === term.quiz.correctAnswer) {
+                            setQuizFeedback((prev) => ({ ...prev, [term.term]: 'correct' }));
+                          } else {
+                            setQuizFeedback((prev) => ({ ...prev, [term.term]: 'incorrect' }));
+                          }
+                        }}
+                        disabled={quizFeedback[term.term] === 'correct'}
+                        aria-label={`Select answer: ${choice}`}
+                      >
+                        {choice}
+                      </button>
+                    ))}
+                  </div>
+                  {quizFeedback[term.term] === 'correct' && (
+                    <p className="mt-3 text-green-600 font-semibold">Correct! 🎉</p>
+                  )}
+                  {quizFeedback[term.term] === 'incorrect' && (
+                    <p className="mt-3 text-red-600 font-semibold">Incorrect. Try again!</p>
+                  )}
                 </div>
               </div>
             )}
