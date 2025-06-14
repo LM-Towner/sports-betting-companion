@@ -120,6 +120,7 @@ const OddsCalculator = () => {
                     value={format}
                     onChange={(e) => setFormat(e.target.value as OddsFormat)}
                     className="w-full p-4 text-sm border rounded-lg bg-white dark:bg-dark border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white focus:ring-2 focus:ring-accent focus:border-transparent transition-all duration-200"
+                    title="Select the odds format you want to use."
                   >
                     <option value="american">American (-110, +150)</option>
                     <option value="decimal">Decimal (1.91, 2.50)</option>
@@ -144,6 +145,7 @@ const OddsCalculator = () => {
                     className={`w-full text-sm p-4 border rounded-lg bg-white dark:bg-dark border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white focus:ring-2 focus:ring-accent focus:border-transparent transition-all duration-200 ${
                       odds && !isValidOdds(odds, format) ? 'border-red-500' : ''
                     }`}
+                    title="Enter the odds in the selected format. For American, use -110 or +150."
                   />
                   {odds && !isValidOdds(odds, format) && (
                     <p className="text-red-500 text-xs mt-1">
@@ -164,12 +166,14 @@ const OddsCalculator = () => {
                     onChange={(e) => setStake(e.target.value)}
                     placeholder="Enter stake amount"
                     className="w-full text-sm p-4 border rounded-lg bg-white dark:bg-dark border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white focus:ring-2 focus:ring-accent focus:border-transparent transition-all duration-200"
+                    title="Enter the amount you want to bet."
                   />
                 </div>
               </div>
               <button
                 onClick={handleCalculate}
                 className="w-full bg-blue-700 hover:bg-blue-800 text-white font-semibold py-3 px-4 rounded-lg shadow focus:outline-none focus-visible:ring-2 focus-visible:ring-accent transition-all text-lg"
+                title="Click to calculate your implied probability and potential payout."
               >
                 Calculate
               </button>
