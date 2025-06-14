@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { SparklesIcon, MagnifyingGlassIcon, ShareIcon, LightBulbIcon } from '@heroicons/react/24/outline';
+import { SparklesIcon, MagnifyingGlassIcon, LightBulbIcon } from '@heroicons/react/24/outline';
 import { glossaryTerms } from '../glossary.lessons';
 
 type Quiz = {
@@ -118,23 +118,6 @@ const Glossary = () => {
         }, 2000);
       }
     }, 100);
-  };
-
-  const handleShare = async (term: Term) => {
-    const shareText = `Check out this betting term: ${term.term} - ${term.definition}`;
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: 'Bet Buddy Term',
-          text: shareText,
-        });
-      } catch {
-        // Error sharing is silently ignored
-      }
-    } else {
-      navigator.clipboard.writeText(shareText);
-      alert('Term copied to clipboard!');
-    }
   };
 
   const showRandomTip = () => {
