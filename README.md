@@ -1,103 +1,111 @@
-# Bet Buddy - Sports Betting Companion
+# 🧠 Bet Buddy
 
-A modern web application designed to help sports bettors make informed decisions and manage their betting activities effectively.
+[🌐 Live Demo](https://sports-betting-companion.vercel.app/)
 
-## Features
+**Bet Buddy** is a beginner-friendly sports betting companion app that helps users understand odds, bet types, and strategies — without risking real money. Designed as a hands-on learning platform, Bet Buddy makes sports betting approachable, interactive, and even a little fun.
 
-### 🎯 Odds Calculator
-- Convert between American, Decimal, and Fractional odds formats
-- Calculate potential winnings and implied probability
-- Real-time calculations with instant format conversion
+---
 
-### 📚 Betting Glossary
-- Comprehensive collection of betting terms and definitions
-- Interactive cards with examples and explanations
-- Category-based organization (Bet Types, Slang, Odds Format, Strategy)
-- Progress tracking for learned terms
-- Quick tips feature for betting advice
-- Search and filter functionality
+## 📸 Screenshots
 
-### 📝 Bet Slip Simulator
-- Practice building bet slips without risking real money
-- Track potential outcomes and payouts
-- Multiple bet type support
+> _Screenshots coming soon!_
 
-### 🎨 Modern UI/UX
-- Clean, responsive design
-- Dark mode support
-- Smooth animations and transitions
-- Mobile-friendly interface
+<!--
+![Home Page](./screenshots/home.png)
+![Odds Calculator](./screenshots/calculator.png)
+![Glossary](./screenshots/glossary.png)
+-->
 
-## Tech Stack
+---
 
-- **Frontend Framework**: React + TypeScript
-- **Build Tool**: Vite
-- **Styling**: Tailwind CSS
-- **Icons**: Heroicons
-- **Routing**: React Router
-- **State Management**: React Hooks
+## ✨ Features
 
-## Getting Started
+### 1. 🧮 Odds Calculator
+- Supports **American**, **Decimal**, and **Fractional** odds formats.
+- Input validation for all formats to prevent errors.
+- Calculates **implied probability** and **potential payout** instantly.
+- Allows **pre-filling odds and stake** from glossary terms.
 
-### Prerequisites
+### 2. 📘 Interactive Glossary
+- Searchable glossary of common betting terms.
+- Each term includes:
+  - Emoji & category tag
+  - Clear definition
+  - Real-world example
+  - "Try This Term" → Prefills calculator with sample odds/stake
+  - Interactive quiz with instant feedback
+- Progress tracking: mark terms as learned and view a progress bar.
+- Surprise Me + Quick Tip buttons for exploration and engagement.
 
-- Node.js (v14 or higher)
-- npm or yarn
+### 3. 🖼️ UI/UX Enhancements
+- Fully responsive and mobile-friendly.
+- Tailwind CSS-based layout with **custom theming**.
+- Dark mode toggle with user preference persistence.
+- Only one glossary card can be expanded at a time for clean UX.
+- Custom favicon and page title ("BB – Bet Buddy").
 
-### Installation
+### 4. 🛠️ Technical Stack & Structure
+- **React 18 + Vite + TypeScript**
+- Tailwind CSS (with PostCSS and custom colors)
+- Feature-based folder structure (`features/calculator`, `features/glossary`, etc.)
+- React Router for navigation
+- State managed with hooks and `localStorage`
+- Fully typed glossary data via TypeScript module
+- Error boundary + loading spinner for a robust experience
 
-1. Clone the repository:
+---
+
+## 🧪 Tech Stack
+
+- React + Vite + TypeScript
+- Tailwind CSS (Dark mode + custom theme)
+- React Router
+- LocalStorage for user progress
+- Framer Motion (optional animations)
+
+---
+
+## 🚀 Getting Started
+
+1. **Clone the repo:**
    ```bash
-   git clone https://github.com/yourusername/sports-betting-companion.git
-   cd sports-betting-companion
+   git clone https://github.com/your-username/bet-buddy.git
+   cd bet-buddy
    ```
-
-2. Install dependencies:
+2. **Install dependencies:**
    ```bash
    npm install
-   # or
-   yarn install
    ```
-
-3. Start the development server:
+3. **Start the dev server:**
    ```bash
    npm run dev
-   # or
-   yarn dev
    ```
+4. **Build for production:**
+   ```bash
+   npm run build
+   ```
+5. **Preview production build:**
+   ```bash
+   npm run preview
+   ```
+6. **Visit:**  
+   [http://localhost:5173](http://localhost:5173) (or as shown in your terminal)
 
-4. Open your browser and navigate to `http://localhost:5173`
+---
 
-## Usage
+## 🤝 Contributing
 
-### Odds Calculator
-1. Select your preferred odds format
-2. Enter the odds value
-3. Enter your stake amount
-4. View the converted odds and potential winnings
+Contributions, issues, and feature requests are welcome!  
+Feel free to open an issue or submit a pull request.
 
-### Betting Glossary
-1. Browse terms by category or use the search function
-2. Click on a term card to expand and view details
-3. Mark terms as learned to track your progress
-4. Use the "Quick Tip" button for random betting advice
-5. Share terms with others using the share button
+1. Fork the repo
+2. Create your feature branch (`git checkout -b feature/YourFeature`)
+3. Commit your changes (`git commit -am 'Add some feature'`)
+4. Push to the branch (`git push origin feature/YourFeature`)
+5. Open a pull request
 
-### Bet Slip Simulator
-1. Add selections to your bet slip
-2. Choose bet type and stake amount
-3. View potential returns and outcomes
+---
 
-## Contributing
+## 📄 License
 
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Acknowledgments
-
-- Built with [Vite](https://vitejs.dev/)
-- Styled with [Tailwind CSS](https://tailwindcss.com/)
-- Icons from [Heroicons](https://heroicons.com/)
+This project is [MIT](./LICENSE) licensed.
