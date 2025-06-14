@@ -35,6 +35,20 @@ const quickTips = [
   "Don't bet more than you can afford to lose",
 ];
 
+// Helper to get or create a unique user ID
+function getUserId() {
+  let userId = localStorage.getItem('betbuddy_userid');
+  if (!userId) {
+    userId = crypto.randomUUID();
+    localStorage.setItem('betbuddy_userid', userId);
+  }
+  return userId;
+}
+const userId = getUserId();
+const LEARNED_TERMS_KEY = `betbuddy_${userId}_learnedTerms`;
+const QUIZ_ANSWERS_KEY = `betbuddy_${userId}_quizAnswers`;
+const QUIZ_FEEDBACK_KEY = `betbuddy_${userId}_quizFeedback`;
+
 const Glossary = () => {
   const [learnedTerms, setLearnedTerms] = useState<Set<string>>(new Set());
   const [searchQuery, setSearchQuery] = useState('');
@@ -42,16 +56,30 @@ const Glossary = () => {
   const [showQuickTip, setShowQuickTip] = useState(false);
   const [currentTip, setCurrentTip] = useState('');
   const [expandedTerm, setExpandedTerm] = useState<number | null>(null);
-  const [quizAnswers, setQuizAnswers] = useState<Record<string, string>>({});
-  const [quizFeedback, setQuizFeedback] = useState<Record<string, string>>({});
+  const [quizAnswers, setQuizAnswers] = useState<Record<string, string>>(() => {
+    const saved = localStorage.getItem(QUIZ_ANSWERS_KEY);
+    return saved ? JSON.parse(saved) : {};
+  });
+  const [quizFeedback, setQuizFeedback] = useState<Record<string, string>>(() => {
+    const saved = localStorage.getItem(QUIZ_FEEDBACK_KEY);
+    return saved ? JSON.parse(saved) : {};
+  });
   const navigate = useNavigate();
 
   useEffect(() => {
-    const savedLearnedTerms = localStorage.getItem('learnedTerms');
+    const savedLearnedTerms = localStorage.getItem(LEARNED_TERMS_KEY);
     if (savedLearnedTerms) {
       setLearnedTerms(new Set(JSON.parse(savedLearnedTerms)));
     }
   }, []);
+
+  // Persist quizAnswers and quizFeedback to localStorage when they change
+  useEffect(() => {
+    localStorage.setItem(QUIZ_ANSWERS_KEY, JSON.stringify(quizAnswers));
+  }, [quizAnswers]);
+  useEffect(() => {
+    localStorage.setItem(QUIZ_FEEDBACK_KEY, JSON.stringify(quizFeedback));
+  }, [quizFeedback]);
 
   const toggleLearned = (termId: string) => {
     const newLearnedTerms = new Set(learnedTerms);
@@ -61,7 +89,7 @@ const Glossary = () => {
       newLearnedTerms.add(termId);
     }
     setLearnedTerms(newLearnedTerms);
-    localStorage.setItem('learnedTerms', JSON.stringify([...newLearnedTerms]));
+    localStorage.setItem(LEARNED_TERMS_KEY, JSON.stringify([...newLearnedTerms]));
   };
 
   const handleTryTerm = (term: Term) => {
