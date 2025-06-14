@@ -27,56 +27,70 @@ const OddsCalculator = () => {
     }
   }, [state]);
 
-  const calculateImpliedProbability = (odds: number, format: OddsFormat): number => {
-    let numerator: number;
-    let denominator: number;
-    
+  // Helper validation functions
+  const isValidOdds = (odds: string, format: OddsFormat): boolean => {
     switch (format) {
       case 'american':
-        return odds > 0
-          ? 100 / (odds + 100)
-          : Math.abs(odds) / (Math.abs(odds) + 100);
+        return /^-?\d+$/.test(odds) && odds !== '0';
       case 'decimal':
-        return 1 / odds;
+        return /^\d*\.?\d+$/.test(odds) && parseFloat(odds) > 1;
       case 'fractional':
-        [numerator, denominator] = odds.toString().split('/').map(Number);
-        return denominator / (numerator + denominator);
+        return /^\d+\/\d+$/.test(odds) && odds.split('/').every((n) => Number(n) > 0);
+      default:
+        return false;
+    }
+  };
+
+  const calculateImpliedProbability = (odds: string, format: OddsFormat): number => {
+    switch (format) {
+      case 'american': {
+        const num = parseInt(odds, 10);
+        return num > 0 ? 100 / (num + 100) : Math.abs(num) / (Math.abs(num) + 100);
+      }
+      case 'decimal': {
+        const dec = parseFloat(odds);
+        return 1 / dec;
+      }
+      case 'fractional': {
+        const [num, denom] = odds.split('/').map(Number);
+        return denom / (num + denom);
+      }
       default:
         return 0;
     }
   };
 
-  const calculatePayout = (odds: number, stake: number, format: OddsFormat): number => {
-    let numerator: number;
-    let denominator: number;
-    
+  const calculatePayout = (odds: string, stake: number, format: OddsFormat): number => {
     switch (format) {
-      case 'american':
-        return odds > 0
-          ? (odds / 100) * stake + stake
-          : (100 / Math.abs(odds)) * stake + stake;
-      case 'decimal':
-        return odds * stake;
-      case 'fractional':
-        [numerator, denominator] = odds.toString().split('/').map(Number);
-        return (numerator / denominator) * stake + stake;
+      case 'american': {
+        const num = parseInt(odds, 10);
+        return num > 0 ? (num / 100) * stake + stake : (100 / Math.abs(num)) * stake + stake;
+      }
+      case 'decimal': {
+        const dec = parseFloat(odds);
+        return dec * stake;
+      }
+      case 'fractional': {
+        const [num, denom] = odds.split('/').map(Number);
+        return (num / denom) * stake + stake;
+      }
       default:
         return 0;
     }
   };
 
   const handleCalculate = () => {
-    const oddsNum = parseFloat(odds);
-    const stakeNum = parseFloat(stake);
-
-    if (isNaN(oddsNum) || isNaN(stakeNum) || stakeNum <= 0) {
+    if (!isValidOdds(odds, format)) {
       setResult(null);
       return;
     }
-
-    const impliedProb = calculateImpliedProbability(oddsNum, format);
-    const payout = calculatePayout(oddsNum, stakeNum, format);
-
+    const stakeNum = parseFloat(stake);
+    if (isNaN(stakeNum) || stakeNum <= 0) {
+      setResult(null);
+      return;
+    }
+    const impliedProb = calculateImpliedProbability(odds, format);
+    const payout = calculatePayout(odds, stakeNum, format);
     setResult({
       impliedProbability: impliedProb * 100,
       potentialPayout: payout,
@@ -111,9 +125,25 @@ const OddsCalculator = () => {
             type="text"
             value={odds}
             onChange={(e) => setOdds(e.target.value)}
-            placeholder={format === 'fractional' ? 'e.g., 10/11' : 'e.g., -110'}
-            className="w-full p-2 border rounded-md bg-white dark:bg-dark border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white focus:ring-2 focus:ring-accent focus:border-transparent transition-all duration-200"
+            placeholder={
+              format === 'fractional'
+                ? 'e.g., 10/11'
+                : format === 'decimal'
+                ? 'e.g., 1.91'
+                : 'e.g., -110'
+            }
+            className={`w-full p-2 border rounded-md bg-white dark:bg-dark border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white focus:ring-2 focus:ring-accent focus:border-transparent transition-all duration-200 ${
+              odds && !isValidOdds(odds, format) ? 'border-red-500' : ''
+            }`}
           />
+          {odds && !isValidOdds(odds, format) && (
+            <p className="text-red-500 text-xs mt-1">
+              Enter valid odds for the selected format.<br />
+              <span className="text-gray-600">
+                Example: {format === 'fractional' ? '10/11' : format === 'decimal' ? '1.91' : '-110 or +150'}
+              </span>
+            </p>
+          )}
         </div>
 
         <div>
