@@ -104,15 +104,20 @@ const Glossary = () => {
   };
 
   const handleSurpriseMe = () => {
-    const randomTerm = terms[Math.floor(Math.random() * terms.length)];
-    const element = document.getElementById(`term-${randomTerm.term}`);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      element.classList.add('animate-pulse');
-      setTimeout(() => {
-        element.classList.remove('animate-pulse');
-      }, 2000);
-    }
+    if (filteredTerms.length === 0) return;
+    const randomIdx = Math.floor(Math.random() * filteredTerms.length);
+    setExpandedTerm(randomIdx);
+    const randomTerm = filteredTerms[randomIdx];
+    setTimeout(() => {
+      const element = document.getElementById(`term-${randomTerm.term}`);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        element.classList.add('animate-pulse');
+        setTimeout(() => {
+          element.classList.remove('animate-pulse');
+        }, 2000);
+      }
+    }, 100);
   };
 
   const handleShare = async (term: Term) => {
@@ -232,8 +237,8 @@ const Glossary = () => {
           <article
             key={term.term}
             id={`term-${term.term}`}
-            className={`bg-white dark:bg-dark rounded-lg shadow-md p-6 transition-all duration-200 border border-gray-200 dark:border-gray-700 cursor-pointer hover:shadow-lg focus-within:ring-2 focus-within:ring-accent ${
-              expandedTerm === idx ? 'ring-2 ring-accent' : ''
+            className={`bg-white dark:bg-dark rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 transition-all duration-200 cursor-pointer hover:shadow-2xl focus-within:ring-2 focus-within:ring-accent ${
+              expandedTerm === idx ? 'ring-2 ring-accent scale-[1.02]' : ''
             }`}
             tabIndex={0}
             aria-expanded={expandedTerm === idx}
@@ -246,117 +251,101 @@ const Glossary = () => {
               }
             }}
           >
-            <div className="flex items-start justify-between">
-              <div className="flex items-center gap-3">
-                <span className="text-2xl" aria-hidden="true">{term.emoji}</span>
-                <div>
-                  <h2 className="text-xl font-semibold text-primary dark:text-white">
-                    {term.term}
-                  </h2>
-                  <span className="text-sm text-gray-500 dark:text-gray-400">
-                    {term.category}
-                  </span>
-                </div>
+            {/* Card Header */}
+            <div className="flex items-center gap-3 px-4 py-3 rounded-t-xl bg-gradient-to-r from-blue-700 to-blue-500 text-white border-b border-blue-800">
+              <span className="text-2xl" aria-hidden="true">{term.emoji}</span>
+              <div className="flex-1">
+                <h2 className="text-lg font-bold tracking-wide">{term.term}</h2>
+                <span className="text-xs font-medium opacity-80">{term.category}</span>
               </div>
-              <div className="flex items-center gap-2">
-                {learnedTerms.has(term.term) && (
-                  <span className="bg-accent/20 text-accent px-2 py-1 rounded-full text-xs font-medium" aria-label="Learned">Learned</span>
-                )}
-                <button
-                  onClick={e => {
-                    e.stopPropagation();
-                    handleShare(term);
-                  }}
-                  className="p-1 text-gray-500 hover:text-accent transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
-                  aria-label={`Share term ${term.term}`}
-                  title="Share term"
-                >
-                  <ShareIcon className="h-5 w-5" aria-hidden="true" />
-                </button>
-              </div>
+              {learnedTerms.has(term.term) && (
+                <span className="bg-white/20 text-white px-2 py-1 rounded-full text-xs font-medium" aria-label="Learned">Learned</span>
+              )}
             </div>
 
-            <p className="text-gray-700 dark:text-gray-300 mt-4">
-              {term.definition}
-            </p>
+            {/* Card Body */}
+            <div className="p-4">
+              <p className="text-gray-700 dark:text-gray-300 mb-4 text-sm">{term.definition}</p>
 
-            {expandedTerm === idx && (
-              <div className="mt-4 space-y-4 transition-all duration-300">
-                <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-md">
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
-                    <span className="font-medium text-primary dark:text-accent">Example:</span> {term.example}
-                  </p>
-                </div>
-
-                <div className="flex flex-col gap-2">
-                  <button
-                    onClick={e => {
-                      e.stopPropagation();
-                      handleTryTerm(term);
-                    }}
-                    className="w-full bg-primary text-white py-2 px-4 rounded-md hover:bg-primary/90 transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
-                    aria-label={`Try this term in the calculator: ${term.term}`}
-                    title="Try this term in the calculator"
-                  >
-                    Try This Term
-                  </button>
-                  <button
-                    onClick={e => {
-                      e.stopPropagation();
-                      toggleLearned(term.term);
-                    }}
-                    className={`w-full py-2 px-4 rounded-md transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent ${
-                      learnedTerms.has(term.term)
-                        ? 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
-                        : 'bg-accent/10 text-accent hover:bg-accent/20'
-                    }`}
-                    aria-label={learnedTerms.has(term.term) ? `Mark ${term.term} as unlearned` : `Mark ${term.term} as learned`}
-                    title={learnedTerms.has(term.term) ? 'Mark as unlearned' : 'Mark as learned'}
-                  >
-                    {learnedTerms.has(term.term) ? 'Mark as Unlearned' : 'Mark as Learned'}
-                  </button>
-                </div>
-
-                {/* Quiz Section */}
-                <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-md">
-                  <p className="font-medium text-primary dark:text-accent mb-2">Quiz:</p>
-                  <p className="mb-3 text-gray-700 dark:text-gray-300">{term.quiz.question}</p>
-                  <div className="flex flex-col gap-2">
-                    {term.quiz.choices.map((choice) => (
-                      <button
-                        key={choice}
-                        className={`text-left px-4 py-2 rounded-md border transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent ${
-                          quizAnswers[term.term] === choice
-                            ? choice === term.quiz.correctAnswer
-                              ? 'bg-green-100 border-green-400 text-green-800'
-                              : 'bg-red-100 border-red-400 text-red-800'
-                            : 'bg-white dark:bg-dark border-gray-300 dark:border-gray-600 hover:bg-accent/10'
-                        }`}
-                        onClick={e => {
-                          e.stopPropagation();
-                          setQuizAnswers((prev) => ({ ...prev, [term.term]: choice }));
-                          if (choice === term.quiz.correctAnswer) {
-                            setQuizFeedback((prev) => ({ ...prev, [term.term]: 'correct' }));
-                          } else {
-                            setQuizFeedback((prev) => ({ ...prev, [term.term]: 'incorrect' }));
-                          }
-                        }}
-                        disabled={quizFeedback[term.term] === 'correct'}
-                        aria-label={`Select answer: ${choice}`}
-                      >
-                        {choice}
-                      </button>
-                    ))}
+              {expandedTerm === idx && (
+                <div className="space-y-4 transition-all duration-300">
+                  {/* Example Section */}
+                  <div className="bg-blue-50 dark:bg-blue-900/30 p-3 rounded-md border border-blue-100 dark:border-blue-900">
+                    <span className="block text-xs font-semibold text-blue-700 dark:text-blue-200 mb-1">Example</span>
+                    <span className="text-gray-800 dark:text-gray-100 text-sm">{term.example}</span>
                   </div>
-                  {quizFeedback[term.term] === 'correct' && (
-                    <p className="mt-3 text-green-600 font-semibold">Correct! 🎉</p>
-                  )}
-                  {quizFeedback[term.term] === 'incorrect' && (
-                    <p className="mt-3 text-red-600 font-semibold">Incorrect. Try again!</p>
-                  )}
+
+                  {/* Action Buttons */}
+                  <div className="flex flex-col sm:flex-row gap-2">
+                    <button
+                      onClick={e => {
+                        e.stopPropagation();
+                        handleTryTerm(term);
+                      }}
+                      className="flex-1 bg-blue-700 hover:bg-blue-800 text-white font-semibold py-2 px-4 rounded-md shadow focus:outline-none focus-visible:ring-2 focus-visible:ring-accent transition-all"
+                      aria-label={`Try this term in the calculator: ${term.term}`}
+                      title="Try this term in the calculator"
+                    >
+                      Try This Term
+                    </button>
+                    <button
+                      onClick={e => {
+                        e.stopPropagation();
+                        toggleLearned(term.term);
+                      }}
+                      className={`flex-1 py-2 px-4 rounded-md font-semibold border transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-accent ${
+                        learnedTerms.has(term.term)
+                          ? 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600'
+                          : 'bg-white dark:bg-dark text-blue-700 dark:text-blue-200 border-blue-200 dark:border-blue-700 hover:bg-blue-50 dark:hover:bg-blue-900/20'
+                      }`}
+                      aria-label={learnedTerms.has(term.term) ? `Mark ${term.term} as unlearned` : `Mark ${term.term} as learned`}
+                      title={learnedTerms.has(term.term) ? 'Mark as unlearned' : 'Mark as learned'}
+                    >
+                      {learnedTerms.has(term.term) ? 'Mark as Unlearned' : 'Mark as Learned'}
+                    </button>
+                  </div>
+
+                  {/* Quiz Section */}
+                  <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-md border border-gray-200 dark:border-gray-700">
+                    <p className="font-medium text-blue-700 dark:text-blue-200 mb-2">Quiz</p>
+                    <p className="mb-3 text-gray-700 dark:text-gray-300 text-sm">{term.quiz.question}</p>
+                    <div className="flex flex-col gap-2">
+                      {term.quiz.choices.map((choice) => (
+                        <button
+                          key={choice}
+                          className={`text-left px-4 py-2 rounded-md border transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent font-medium text-sm ${
+                            quizAnswers[term.term] === choice
+                              ? choice === term.quiz.correctAnswer
+                                ? 'bg-green-100 border-green-400 text-green-800'
+                                : 'bg-red-100 border-red-400 text-red-800'
+                              : 'bg-white dark:bg-dark border-gray-300 dark:border-gray-600 hover:bg-accent/10'
+                          }`}
+                          onClick={e => {
+                            e.stopPropagation();
+                            setQuizAnswers((prev) => ({ ...prev, [term.term]: choice }));
+                            if (choice === term.quiz.correctAnswer) {
+                              setQuizFeedback((prev) => ({ ...prev, [term.term]: 'correct' }));
+                            } else {
+                              setQuizFeedback((prev) => ({ ...prev, [term.term]: 'incorrect' }));
+                            }
+                          }}
+                          disabled={quizFeedback[term.term] === 'correct'}
+                          aria-label={`Select answer: ${choice}`}
+                        >
+                          {choice}
+                        </button>
+                      ))}
+                    </div>
+                    {quizFeedback[term.term] === 'correct' && (
+                      <p className="mt-3 text-green-600 font-semibold">Correct! 🎉</p>
+                    )}
+                    {quizFeedback[term.term] === 'incorrect' && (
+                      <p className="mt-3 text-red-600 font-semibold">Incorrect. Try again!</p>
+                    )}
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
+            </div>
           </article>
         ))}
       </section>
