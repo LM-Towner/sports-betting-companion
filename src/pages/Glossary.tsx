@@ -95,8 +95,8 @@ const Glossary = () => {
           title: 'Bet Buddy Term',
           text: shareText,
         });
-      } catch (error) {
-        console.log('Error sharing:', error);
+      } catch {
+        // Error sharing is silently ignored
       }
     } else {
       navigator.clipboard.writeText(shareText);
