@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { SparklesIcon, MagnifyingGlassIcon, ShareIcon, LightBulbIcon } from '@heroicons/react/24/outline';
+import { SparklesIcon, MagnifyingGlassIcon, ShareIcon, LightBulbIcon, CalculatorIcon } from '@heroicons/react/24/outline';
 
 type TermCategory = 'Bet Type' | 'Slang' | 'Odds Format' | 'Strategy';
 
@@ -102,12 +102,12 @@ const quickTips = [
 ];
 
 const Glossary = () => {
-  const [expandedTerm, setExpandedTerm] = useState<string | null>(null);
   const [learnedTerms, setLearnedTerms] = useState<Set<string>>(new Set());
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<TermCategory | 'All'>('All');
   const [showQuickTip, setShowQuickTip] = useState(false);
   const [currentTip, setCurrentTip] = useState('');
+  const [expandedTerm, setExpandedTerm] = useState<string | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -186,61 +186,65 @@ const Glossary = () => {
   const progress = Math.round((learnedTerms.size / terms.length) * 100);
 
   return (
-    <div className="max-w-7xl mx-auto p-6">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
-        <h1 className="text-3xl font-bold text-primary dark:text-white">Betting Glossary</h1>
+    <main id="main-content" className="max-w-7xl mx-auto p-6" aria-label="Betting Glossary">
+      <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
+        <h1 className="text-3xl font-bold text-primary dark:text-white" tabIndex={0} aria-label="Betting Glossary">Betting Glossary</h1>
         <div className="flex gap-2">
           <button
             onClick={showRandomTip}
-            className="flex items-center gap-2 bg-accent text-white px-4 py-2 rounded-md hover:bg-accent/90 transition-all duration-200"
+            className="flex items-center gap-2 bg-accent text-white px-4 py-2 rounded-md hover:bg-accent/90 transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            aria-label="Show a quick betting tip"
+            title="Show a quick betting tip"
           >
-            <LightBulbIcon className="h-5 w-5" />
+            <LightBulbIcon className="h-5 w-5" aria-hidden="true" />
             Quick Tip
           </button>
           <button
             onClick={handleSurpriseMe}
-            className="flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-md hover:bg-primary/90 transition-all duration-200"
+            className="flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-md hover:bg-primary/90 transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            aria-label="Surprise me with a random term"
+            title="Surprise me with a random term"
           >
-            <SparklesIcon className="h-5 w-5" />
+            <SparklesIcon className="h-5 w-5" aria-hidden="true" />
             Surprise Me
           </button>
         </div>
-      </div>
+      </header>
 
       {/* Progress Bar */}
-      <div className="mb-8">
+      <section className="mb-8" aria-label="Learning Progress">
         <div className="flex justify-between items-center mb-2">
-          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-            Learning Progress
-          </span>
-          <span className="text-sm font-medium text-primary">
-            {progress}%
-          </span>
+          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Learning Progress</span>
+          <span className="text-sm font-medium text-primary">{progress}%</span>
         </div>
-        <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+        <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2" aria-hidden="true">
           <div
             className="bg-accent h-2 rounded-full transition-all duration-500"
             style={{ width: `${progress}%` }}
           />
         </div>
-      </div>
+      </section>
 
       {/* Search and Filter */}
-      <div className="mb-8 space-y-4 sm:space-y-0 sm:flex sm:gap-4">
+      <section className="mb-8 space-y-4 sm:space-y-0 sm:flex sm:gap-4" aria-label="Search and Filter Terms">
         <div className="relative flex-1">
-          <MagnifyingGlassIcon className="h-5 w-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+          <MagnifyingGlassIcon className="h-5 w-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" aria-hidden="true" />
           <input
             type="text"
             placeholder="Search terms..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border rounded-md bg-white dark:bg-dark border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white focus:ring-2 focus:ring-accent focus:border-transparent transition-all duration-200"
+            className="w-full pl-10 pr-4 py-2 border rounded-md bg-white dark:bg-dark border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white focus:ring-2 focus:ring-accent focus:border-transparent transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            aria-label="Search terms"
           />
         </div>
+        <label className="sr-only" htmlFor="category-select">Filter by category</label>
         <select
+          id="category-select"
           value={selectedCategory}
           onChange={(e) => setSelectedCategory(e.target.value as TermCategory | 'All')}
-          className="w-full sm:w-48 p-2 border rounded-md bg-white dark:bg-dark border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white focus:ring-2 focus:ring-accent focus:border-transparent transition-all duration-200"
+          className="w-full sm:w-48 p-2 border rounded-md bg-white dark:bg-dark border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white focus:ring-2 focus:ring-accent focus:border-transparent transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          aria-label="Filter by category"
         >
           <option value="All">All Categories</option>
           <option value="Bet Type">Bet Types</option>
@@ -248,31 +252,40 @@ const Glossary = () => {
           <option value="Slang">Slang</option>
           <option value="Odds Format">Odds Format</option>
         </select>
-      </div>
+      </section>
 
       {/* Quick Tip Toast */}
       {showQuickTip && (
-        <div className="fixed bottom-4 right-4 bg-white dark:bg-dark p-4 rounded-lg shadow-lg border border-accent/20 animate-fade-in-up">
+        <aside className="fixed bottom-4 right-4 bg-white dark:bg-dark p-4 rounded-lg shadow-lg border border-accent/20 animate-fade-in-up z-50" role="status" aria-live="polite">
           <div className="flex items-start gap-3">
-            <LightBulbIcon className="h-6 w-6 text-accent flex-shrink-0" />
+            <LightBulbIcon className="h-6 w-6 text-accent flex-shrink-0" aria-hidden="true" />
             <p className="text-gray-700 dark:text-gray-300">{currentTip}</p>
           </div>
-        </div>
+        </aside>
       )}
       
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" aria-label="Glossary Terms">
         {filteredTerms.map((term) => (
-          <div
+          <article
             key={term.id}
             id={`term-${term.id}`}
-            className={`bg-white dark:bg-dark rounded-lg shadow-md p-6 transition-all duration-200 border border-gray-200 dark:border-gray-700 cursor-pointer hover:shadow-lg ${
+            className={`bg-white dark:bg-dark rounded-lg shadow-md p-6 transition-all duration-200 border border-gray-200 dark:border-gray-700 cursor-pointer hover:shadow-lg focus-within:ring-2 focus-within:ring-accent ${
               expandedTerm === term.id ? 'ring-2 ring-accent' : ''
             }`}
+            tabIndex={0}
+            aria-expanded={expandedTerm === term.id}
+            aria-label={`Term: ${term.name}`}
+            role="region"
             onClick={() => setExpandedTerm(expandedTerm === term.id ? null : term.id)}
+            onKeyDown={e => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                setExpandedTerm(expandedTerm === term.id ? null : term.id);
+              }
+            }}
           >
             <div className="flex items-start justify-between">
               <div className="flex items-center gap-3">
-                <span className="text-2xl">{term.emoji}</span>
+                <span className="text-2xl" aria-hidden="true">{term.emoji}</span>
                 <div>
                   <h2 className="text-xl font-semibold text-primary dark:text-white">
                     {term.name}
@@ -284,18 +297,18 @@ const Glossary = () => {
               </div>
               <div className="flex items-center gap-2">
                 {learnedTerms.has(term.id) && (
-                  <span className="bg-accent/20 text-accent px-2 py-1 rounded-full text-xs font-medium">
-                    Learned
-                  </span>
+                  <span className="bg-accent/20 text-accent px-2 py-1 rounded-full text-xs font-medium" aria-label="Learned">Learned</span>
                 )}
                 <button
-                  onClick={(e) => {
+                  onClick={e => {
                     e.stopPropagation();
                     handleShare(term);
                   }}
-                  className="p-1 text-gray-500 hover:text-accent transition-colors duration-200"
+                  className="p-1 text-gray-500 hover:text-accent transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                  aria-label={`Share term ${term.name}`}
+                  title="Share term"
                 >
-                  <ShareIcon className="h-5 w-5" />
+                  <ShareIcon className="h-5 w-5" aria-hidden="true" />
                 </button>
               </div>
             </div>
@@ -305,7 +318,7 @@ const Glossary = () => {
             </p>
 
             {expandedTerm === term.id && (
-              <div className="mt-4 space-y-4">
+              <div className="mt-4 space-y-4 transition-all duration-300">
                 <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-md">
                   <p className="text-sm text-gray-600 dark:text-gray-400">
                     <span className="font-medium text-primary dark:text-accent">Example:</span> {term.example}
@@ -315,35 +328,39 @@ const Glossary = () => {
                 <div className="flex flex-col gap-2">
                   {term.calculatorExample && (
                     <button
-                      onClick={(e) => {
+                      onClick={e => {
                         e.stopPropagation();
                         handleTryTerm(term);
                       }}
-                      className="w-full bg-primary text-white py-2 px-4 rounded-md hover:bg-primary/90 transition-all duration-200"
+                      className="w-full bg-primary text-white py-2 px-4 rounded-md hover:bg-primary/90 transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                      aria-label={`Try this term in the calculator: ${term.name}`}
+                      title="Try this term in the calculator"
                     >
                       Try This Term
                     </button>
                   )}
                   <button
-                    onClick={(e) => {
+                    onClick={e => {
                       e.stopPropagation();
                       toggleLearned(term.id);
                     }}
-                    className={`w-full py-2 px-4 rounded-md transition-all duration-200 ${
+                    className={`w-full py-2 px-4 rounded-md transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent ${
                       learnedTerms.has(term.id)
                         ? 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
                         : 'bg-accent/10 text-accent hover:bg-accent/20'
                     }`}
+                    aria-label={learnedTerms.has(term.id) ? `Mark ${term.name} as unlearned` : `Mark ${term.name} as learned`}
+                    title={learnedTerms.has(term.id) ? 'Mark as unlearned' : 'Mark as learned'}
                   >
                     {learnedTerms.has(term.id) ? 'Mark as Unlearned' : 'Mark as Learned'}
                   </button>
                 </div>
               </div>
             )}
-          </div>
+          </article>
         ))}
-      </div>
-    </div>
+      </section>
+    </main>
   );
 };
 
